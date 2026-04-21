@@ -1,4 +1,4 @@
-# 🐳 MSSQL Server 2017 — Docker
+# 🐳 MSSQL Server 2017 — Docker By JSX v.1.0.0
 
 <div align="center">
   <img src="https://img.shields.io/badge/Microsoft%20SQL%20Server-CC2927?style=for-the-badge&logo=microsoft%20sql%20server&logoColor=white" alt="MSSQL Server" />
@@ -25,7 +25,7 @@
 ```env
 MSSQL_SERVER_IMAGE=mcr.microsoft.com/mssql/server:2017-latest
 MSSQL_CONTAINER_NAME=mssql17
-MSSQL_SA_PASWORD=🔑🔑🔑🔑🔑🔑🔑🔑
+MSSQL_SA_PASSWORD=🔑🔑🔑🔑🔑🔑🔑🔑
 MSSQL_PID=Developer
 MSSQL_TZ=Asia/Bangkok
 MSSQL_PORT=1433
@@ -51,7 +51,11 @@ services:
     volumes:
       - mssql_data:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P '${MSSQL_SA_PASSWORD}' -Q 'SELECT 1' || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P '${MSSQL_SA_PASSWORD}' -Q 'SELECT 1' || exit 1",
+        ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -66,10 +70,10 @@ volumes:
 
 ## 🔌 ข้อมูลการเชื่อมต่อ
 
-| Field    | Value        |
-|----------|--------------|
-| Server   | `localhost,1433` |
-| Username | `SA`         |
+| Field    | Value              |
+| -------- | ------------------ |
+| Server   | `localhost,1433`   |
+| Username | `SA`               |
 | Password | `🔑🔑🔑🔑🔑🔑🔑🔑` |
 
 ---
@@ -82,7 +86,7 @@ volumes:
 
 **ขั้นที่ 1 — บน Linux Server:** pack ข้อมูลใน volume ให้เป็นไฟล์ `.tar.gz`
 
-``` powershell
+```powershell
 sudo tar -czvf  [tar_path] -C [data_path]
 ```
 
@@ -95,7 +99,8 @@ sudo tar -czvf /root/mssql_volume.tar.gz -C /var/lib/docker/volumes/mssql_data/_
 > ผลลัพธ์ใน tar จะเป็น `./data/`, `./log/` ฯลฯ — ไม่มี folder ครอบด้านนอก
 
 **ขั้นที่ 2 — บน Windows (PowerShell):** ดึงไฟล์จาก Server มาที่เครื่อง
-``` powershell
+
+```powershell
 scp [linux_user]@[linux_ip]:[linux_path] "[windows path]"
 ```
 
@@ -109,7 +114,8 @@ scp root@10.182.4.16:/root/mssql_volume.tar.gz "D:\"
 ## 📦 Backup — สำรองข้อมูลจากเครื่อง Windows Local
 
 > ใช้เมื่อ: มีข้อมูลอยู่ใน folder `mssql_volume\` บนเครื่อง Windows แล้ว และต้องการ pack เป็นไฟล์
-``` powershell
+
+```powershell
 tar -czvf "[tar_path]" -C "[data_path]" .
 ```
 
@@ -161,7 +167,6 @@ docker exec temp-ubuntu bash -c "rm -rf /data/*"
 ```powershell
 docker cp "[tar_path]" temp-ubuntu:/data/
 ```
-
 
 ```powershell
 # ตัวอย่าง
@@ -217,12 +222,12 @@ docker logs mssql17 --tail 20
 
 ## ❓ Troubleshooting
 
-| ปัญหา | วิธีตรวจสอบ |
-|-------|------------|
-| Container ไม่ขึ้น | `docker logs mssql17` |
-| เชื่อมต่อไม่ได้ | `docker ps` — ดูว่า port 1433 map อยู่ |
-| Volume หาย | `docker volume ls` |
-| รหัสผ่านไม่ผ่าน | ต้องมีอย่างน้อย 8 ตัว, มีตัวใหญ่ + ตัวเลข + อักขระพิเศษ |
+| ปัญหา             | วิธีตรวจสอบ                                             |
+| ----------------- | ------------------------------------------------------- |
+| Container ไม่ขึ้น | `docker logs mssql17`                                   |
+| เชื่อมต่อไม่ได้   | `docker ps` — ดูว่า port 1433 map อยู่                  |
+| Volume หาย        | `docker volume ls`                                      |
+| รหัสผ่านไม่ผ่าน   | ต้องมีอย่างน้อย 8 ตัว, มีตัวใหญ่ + ตัวเลข + อักขระพิเศษ |
 
 ---
 
