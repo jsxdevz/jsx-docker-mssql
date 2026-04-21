@@ -1,0 +1,5 @@
+# Ignore the .env file
+.env
+
+# Ignore all .tar.gz files
+*.tar.gz

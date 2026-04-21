@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  MSSQL_SERVER:
+    image: ${MSSQL_SERVER_IMAGE}
+    container_name: ${MSSQL_CONTAINER_NAME}
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      MSSQL_PID: ${MSSQL_PID}
+      TZ: ${MSSQL_TZ}
+    user: "root"
+    ports:
+      - "${MSSQL_PORT}:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P '${MSSQL_SA_PASSWORD}' -Q 'SELECT 1' || exit 1",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  mssql_data:
+    external: true
