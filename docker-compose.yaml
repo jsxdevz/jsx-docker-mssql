@@ -3,6 +3,7 @@ version: "3.9"
 services:
   MSSQL_SERVER:
     image: ${MSSQL_SERVER_IMAGE}
+    restart: always
     container_name: ${MSSQL_CONTAINER_NAME}
     environment:
       ACCEPT_EULA: "Y"
