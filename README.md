@@ -86,12 +86,7 @@ volumes:
 
 **ขั้นที่ 1 — บน Linux Server:** pack ข้อมูลใน volume ให้เป็นไฟล์ `.tar.gz`
 
-```powershell
-sudo tar -czvf  [tar_path] -C [data_path]
-```
-
 ```bash
-# ตัวอย่าง
 sudo tar -czvf /root/mssql_volume.tar.gz -C /var/lib/docker/volumes/mssql_data/_data .
 ```
 
@@ -101,11 +96,6 @@ sudo tar -czvf /root/mssql_volume.tar.gz -C /var/lib/docker/volumes/mssql_data/_
 **ขั้นที่ 2 — บน Windows (PowerShell):** ดึงไฟล์จาก Server มาที่เครื่อง
 
 ```powershell
-scp [linux_user]@[linux_ip]:[linux_path] "[windows path]"
-```
-
-```powershell
-# ตัวอย่าง
 scp root@10.182.4.16:/root/mssql_volume.tar.gz "D:\"
 ```
 
@@ -116,13 +106,32 @@ scp root@10.182.4.16:/root/mssql_volume.tar.gz "D:\"
 > ใช้เมื่อ: มีข้อมูลอยู่ใน folder `mssql_volume\` บนเครื่อง Windows แล้ว และต้องการ pack เป็นไฟล์
 
 ```powershell
-tar -czvf "[tar_path]" -C "[data_path]" .
-```
-
-```powershell
-# ตัวอย่าง
 tar -czvf "D:\mssql_volume.tar.gz" -C "D:\mssql_volume" .
 ```
+
+---
+
+## 🛡️ Backup — วิธีใหม่: สำรองข้อมูลจาก Docker Volume เป็นไฟล์ .tar.gz (แนะนำ)
+
+> ใช้เมื่อ: ต้องการสร้างไฟล์ `.tar.gz` จาก Docker Volume โดยตรง (วิธีนี้ใช้ได้ทุก OS: Windows/Linux/Mac)
+
+### ขั้นตอน
+
+**รันคำสั่งเดียวเพื่อ Backup:**
+
+```powershell
+# สำหรับ PowerShell
+docker run --rm -v mssql_data:/data -v ${PWD}/backup:/backup ubuntu tar -czvf /backup/mssql_volume.tar.gz -C /data .
+
+# สำหรับ Bash (Linux/macOS)
+docker run --rm -v mssql_data:/data -v "$(pwd)/backup":/backup ubuntu tar -czvf /backup/mssql_volume.tar.gz -C /data .
+```
+
+> **อธิบายคำสั่ง:**
+> - `-v mssql_data:/data`: เชื่อมต่อ volume `mssql_data` เข้ากับ container ที่ path `/data`
+> - `-v ${PWD}/backup:/backup`: เชื่อมต่อ folder `backup` ของเรา เข้ากับ container ที่ path `/backup`
+> - `tar -czvf ...`: สั่งให้ container บีบอัดข้อมูลจาก `/data` ไปเก็บไว้ที่ `/backup/mssql_volume.tar.gz` (ซึ่งจะโผล่ใน folder backup ของเครื่องเรา)
+> - `--rm`: ลบ container ทิ้งทันทีเมื่อทำงานเสร็จ
 
 ---
 
@@ -153,9 +162,6 @@ docker compose down
 docker run -d --rm -v mssql_data:/data --name temp-ubuntu ubuntu sleep infinity
 ```
 
-> `sleep infinity` = ให้ container รันค้างไว้เพื่อใช้งานต่อ  
-> `--rm` = ลบ container อัตโนมัติเมื่อหยุด
-
 **ขั้นที่ 3 — ลบข้อมูลเก่าใน volume ออกให้หมด**
 
 ```powershell
@@ -165,12 +171,7 @@ docker exec temp-ubuntu bash -c "rm -rf /data/*"
 **ขั้นที่ 4 — Copy ไฟล์ `.tar.gz` เข้า container**
 
 ```powershell
-docker cp "[tar_path]" temp-ubuntu:/data/
-```
-
-```powershell
-# ตัวอย่าง
-docker cp "D:\mssql_volume.tar.gz" temp-ubuntu:/data/
+docker cp ".\backup\mssql_volume.tar.gz" temp-ubuntu:/data/
 ```
 
 **ขั้นที่ 5 — Extract ไฟล์เข้า volume**
@@ -179,9 +180,7 @@ docker cp "D:\mssql_volume.tar.gz" temp-ubuntu:/data/
 docker exec temp-ubuntu bash -c "tar -xzvf /data/mssql_volume.tar.gz -C /data && rm /data/mssql_volume.tar.gz"
 ```
 
-> Extract เสร็จแล้วลบไฟล์ `.tar.gz` ออกเพื่อไม่ให้ค้างใน volume
-
-**ขั้นที่ 6 — หยุด Ubuntu container** (จะถูกลบอัตโนมัติเพราะมี `--rm`)
+**ขั้นที่ 6 — หยุด Ubuntu container**
 
 ```powershell
 docker stop temp-ubuntu
@@ -232,6 +231,6 @@ docker logs mssql17 --tail 20
 ---
 
 <div align="center">
-  <p><em>อัปเดตล่าสุด: 21 เมษายน 2569 (April 21, 2026)</em></p>
+  <p><em>อัปเดตล่าสุด: 11 พฤษภาคม 2569 (May 11, 2026)</em></p>
   <p>Made with ❤️ by jsx</p>
 </div>
