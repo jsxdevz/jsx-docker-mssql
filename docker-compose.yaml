@@ -5,6 +5,7 @@ services:
     image: ${MSSQL_SERVER_IMAGE}
     restart: always
     container_name: ${MSSQL_CONTAINER_NAME}
+    platform: ${MSSQL_PLATFORM}
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
